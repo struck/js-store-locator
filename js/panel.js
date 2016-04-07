@@ -48,7 +48,8 @@ storeLocator.Panel = function(el, opt_options) {
       'locationSearchLabel': 'Where are you?',
       'featureFilter': true,
       'directions': true,
-      'view': null
+      'view': null,
+      'locationListCount': 10
     }, opt_options);
 
   this.directionsRenderer_ = new google.maps.DirectionsRenderer({
@@ -93,31 +94,31 @@ storeLocator.Panel.prototype.init_ = function() {
     this.filter_.submit(function() {
       return false;
     });
-
-    google.maps.event.addListener(this, 'geocode', function(place) {
-      if (!place.geometry) {
-        that.searchPosition(place.name);
-        return;
-      }
-
-      this.directionsFrom_ = place.geometry.location;
-
-      if (that.directionsVisible_) {
-        that.renderDirections_();
-      }
-      var sl = that.get('view');
-      sl.highlight(null);
-      var map = sl.getMap();
-      if (place.geometry.viewport) {
-        map.fitBounds(place.geometry.viewport);
-      } else {
-        map.setCenter(place.geometry.location);
-        map.setZoom(13);
-      }
-      sl.refreshView();
-      that.listenForStoresUpdate_();
-    });
   }
+
+  google.maps.event.addListener(this, 'geocode', function(place) {
+    if (!place.geometry) {
+      that.searchPosition(place.name);
+      return;
+    }
+
+    this.directionsFrom_ = place.geometry.location;
+
+    if (that.directionsVisible_) {
+      that.renderDirections_();
+    }
+    var sl = that.get('view');
+    sl.highlight(null);
+    var map = sl.getMap();
+    if (place.geometry.viewport) {
+      map.fitBounds(place.geometry.viewport);
+    } else {
+      map.setCenter(place.geometry.location);
+      map.setZoom(13);
+    }
+    sl.refreshView();
+    that.listenForStoresUpdate_();
+  });
 
   if (this.settings_['featureFilter']) {
     // TODO(cbro): update this on view_changed
@@ -344,7 +345,7 @@ storeLocator.Panel.prototype.stores_changed = function() {
   };
 
   // TODO(cbro): change 10 to a setting/option
-  for (var i = 0, ii = Math.min(10, stores.length); i < ii; i++) {
+  for (var i = 0, ii = Math.min(this.settings_['locationListCount'], stores.length); i < ii; i++) {
     var storeLi = stores[i].getInfoPanelItem();
     storeLi['store'] = stores[i];
     if (selectedStore && stores[i].getId() == selectedStore.getId()) {
