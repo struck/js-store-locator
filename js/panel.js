@@ -75,8 +75,10 @@ storeLocator.Panel.prototype.init_ = function() {
     this.set('view', this.settings_['view']);
   }
 
+  this.locationSearchContainer = (this.settings_['locationSearchContainer']) ? this.settings_['locationSearchContainer'] : this.el_;
+
   this.filter_ = $('<form class="storelocator-filter"/>');
-  this.el_.append(this.filter_);
+  this.locationSearchContainer.append(this.filter_);
 
   if (this.settings_['locationSearch']) {
     this.locationSearch_ = $('<div class="location-search"><h4>' +
